@@ -6,12 +6,8 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.util.GameProfile;
-import com.velocitypowered.proxy.util.except.QuietDecodeException;
-import com.velocitypowered.proxy.util.except.QuietException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.util.ByteProcessor;
-import io.netty.util.concurrent.FastThreadLocal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +16,6 @@ import java.util.UUID;
 public enum ProtocolUtils {
   ;
   private static final int DEFAULT_MAX_STRING_SIZE = 65536; // 64KiB
-  private static final FastThreadLocal<VarintByteDecoder> VARINT_DECODER = new FastThreadLocal<>() {
-    @Override
-    protected VarintByteDecoder initialValue() {
-      return new VarintByteDecoder();
-    }
-  };
 
   /**
    * Reads a Minecraft-style VarInt from the specified {@code buf}.
@@ -33,18 +23,19 @@ public enum ProtocolUtils {
    * @return the decoded VarInt
    */
   public static int readVarInt(ByteBuf buf) {
-    VarintByteDecoder decoder = VARINT_DECODER.get();
-    try {
-      int idx = buf.forEachByte(decoder);
-      if (decoder.successfulDecode && idx >= 0) {
-        buf.readerIndex(idx + 1);
-        return decoder.accumulated;
-      } else {
-        throw new QuietDecodeException("Incomplete VarInt or VarInt too big!");
+    int i = 0;
+    int j = 0;
+    while (true) {
+      int k = buf.readByte();
+      i |= (k & 0x7F) << j++ * 7;
+      if (j > 5) {
+        throw new RuntimeException("VarInt too big");
       }
-    } finally {
-      decoder.reset();
+      if ((k & 0x80) != 128) {
+        break;
+      }
     }
+    return i;
   }
 
   /**
@@ -360,32 +351,6 @@ public enum ProtocolUtils {
         ProtocolVersion version) {
       return (this == SERVERBOUND ? state.serverbound : state.clientbound)
           .getProtocolRegistry(version);
-    }
-  }
-
-  private static class VarintByteDecoder implements ByteProcessor {
-
-    private int accumulated;
-    private int read;
-    private boolean successfulDecode;
-
-    @Override
-    public boolean process(byte k) {
-      accumulated |= (k & 0x7F) << read++ * 7;
-      if (read > 5) {
-        return false;
-      }
-      if ((k & 0x80) != 128) {
-        successfulDecode = true;
-        return false;
-      }
-      return true;
-    }
-
-    public void reset() {
-      accumulated = 0;
-      read = 0;
-      successfulDecode = false;
     }
   }
 }
