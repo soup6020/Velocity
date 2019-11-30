@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.util.GameProfile;
+import com.velocitypowered.proxy.util.except.QuietDecodeException;
 import com.velocitypowered.proxy.util.except.QuietException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -39,7 +40,7 @@ public enum ProtocolUtils {
         buf.readerIndex(idx + 1);
         return decoder.accumulated;
       } else {
-        throw new QuietException("Incomplete VarInt or VarInt too big!");
+        throw new QuietDecodeException("Incomplete VarInt or VarInt too big!");
       }
     } finally {
       decoder.reset();
