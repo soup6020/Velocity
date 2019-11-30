@@ -4,7 +4,6 @@ import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.CorruptedFrameException;
 import java.util.List;
 
 public class MinecraftVarintFrameDecoder extends ByteToMessageDecoder {
@@ -16,28 +15,12 @@ public class MinecraftVarintFrameDecoder extends ByteToMessageDecoder {
     }
 
     int origReaderIndex = in.readerIndex();
-    for (int i = 0; i < 3; i++) {
-      if (!in.isReadable()) {
-        in.readerIndex(origReaderIndex);
-        return;
-      }
+    int packetLength = ProtocolUtils.readVarInt(in);
 
-      byte read = in.readByte();
-      if (read >= 0) {
-        // Make sure reader index of length buffer is returned to the beginning
-        in.readerIndex(origReaderIndex);
-        int packetLength = ProtocolUtils.readVarInt(in);
-
-        if (in.readableBytes() >= packetLength) {
-          out.add(in.readRetainedSlice(packetLength));
-        } else {
-          in.readerIndex(origReaderIndex);
-        }
-
-        return;
-      }
+    if (in.readableBytes() >= packetLength) {
+      out.add(in.readRetainedSlice(packetLength));
+    } else {
+      in.readerIndex(origReaderIndex);
     }
-
-    throw new CorruptedFrameException("VarInt too big");
   }
 }

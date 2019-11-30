@@ -35,13 +35,12 @@ public class MinecraftDecoder extends MessageToMessageDecoder<ByteBuf> {
       return;
     }
 
-    ByteBuf slice = msg.slice();
-
+    int originalIdx = msg.readerIndex();
     int packetId = ProtocolUtils.readVarInt(msg);
     MinecraftPacket packet = this.registry.createPacket(packetId);
     if (packet == null) {
-      msg.skipBytes(msg.readableBytes());
-      out.add(slice.retain());
+      msg.readerIndex(originalIdx);
+      out.add(msg.retain());
     } else {
       try {
         packet.decode(msg, direction, registry.version);
