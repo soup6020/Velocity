@@ -5,6 +5,7 @@ import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ClientSettings implements MinecraftPacket {
@@ -16,18 +17,20 @@ public class ClientSettings implements MinecraftPacket {
   private byte difficulty; // 1.7 Protocol
   private short skinParts;
   private int mainHand;
+  private @MonotonicNonNull Boolean useShieldOnCrouch;
 
   public ClientSettings() {
   }
 
   public ClientSettings(String locale, byte viewDistance, int chatVisibility, boolean chatColors,
-      short skinParts, int mainHand) {
+      short skinParts, int mainHand, Boolean useShieldOnCrouch) {
     this.locale = locale;
     this.viewDistance = viewDistance;
     this.chatVisibility = chatVisibility;
     this.chatColors = chatColors;
     this.skinParts = skinParts;
     this.mainHand = mainHand;
+    this.useShieldOnCrouch = useShieldOnCrouch;
   }
 
   public String getLocale() {
@@ -81,6 +84,17 @@ public class ClientSettings implements MinecraftPacket {
     this.mainHand = mainHand;
   }
 
+  public Boolean getUseShieldOnCrouch() {
+    if (useShieldOnCrouch == null) {
+      throw new IllegalStateException("useShieldOnCrouch not present");
+    }
+    return useShieldOnCrouch;
+  }
+
+  public void setUseShieldOnCrouch(Boolean useShieldOnCrouch) {
+    this.useShieldOnCrouch = useShieldOnCrouch;
+  }
+
   @Override
   public String toString() {
     return "ClientSettings{"
@@ -90,6 +104,7 @@ public class ClientSettings implements MinecraftPacket {
         + ", chatColors=" + chatColors
         + ", skinParts=" + skinParts
         + ", mainHand=" + mainHand
+        + ", useShieldOnCrouch=" + useShieldOnCrouch
         + '}';
   }
 
@@ -108,6 +123,10 @@ public class ClientSettings implements MinecraftPacket {
 
     if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
       this.mainHand = ProtocolUtils.readVarInt(buf);
+    }
+
+    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_COMBAT_6) >= 0) {
+      this.useShieldOnCrouch = buf.readBoolean();
     }
   }
 
@@ -129,6 +148,10 @@ public class ClientSettings implements MinecraftPacket {
 
     if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
       ProtocolUtils.writeVarInt(buf, mainHand);
+    }
+
+    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16_COMBAT_6) >= 0) {
+      buf.writeBoolean(useShieldOnCrouch);
     }
   }
 

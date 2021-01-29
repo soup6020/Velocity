@@ -41,7 +41,8 @@ public enum ProtocolVersion {
   MINECRAFT_1_16_1(736, "1.16.1"),
   MINECRAFT_1_16_2(751, "1.16.2"),
   MINECRAFT_1_16_3(753, "1.16.3"),
-  MINECRAFT_1_16_4(754, "1.16.4");
+  MINECRAFT_1_16_4(754, "1.16.4"),
+  MINECRAFT_1_16_COMBAT_6(803, "Combat Test 8c");
 
   private static final int SNAPSHOT_BIT = 30;
 
