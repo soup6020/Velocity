@@ -1,5 +1,6 @@
 package com.velocitypowered.proxy.protocol.packet;
 
+import com.google.common.collect.ImmutableSet;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
@@ -8,6 +9,8 @@ import io.netty.buffer.ByteBuf;
 import net.kyori.adventure.text.Component;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
 public class TeamPacket implements MinecraftPacket {
 
@@ -101,12 +104,12 @@ public class TeamPacket implements MinecraftPacket {
     this.color = color;
   }
 
-  public String[] getEntites() {
-    return entites;
+  public Set<String> getEntites() {
+    return ImmutableSet.copyOf(entites);
   }
 
-  public void setEntites(String[] entites) {
-    this.entites = entites;
+  public void setEntites(Collection<String> entites) {
+    this.entites = entites.toArray(new String[entites.size()]);
   }
 
   @Override

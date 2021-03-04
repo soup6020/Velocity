@@ -277,7 +277,7 @@ public enum ProtocolUtils {
                                                int maxLen) {
     String read = readString(buf, maxLen);
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) {
-      return GsonComponentSerializer.gson().deserialize(read);
+      return getJsonChatSerializer(protocolVersion).deserialize(read);
     } else {
       return LegacyComponentSerializer.legacySection().deserialize(read);
     }
@@ -304,7 +304,7 @@ public enum ProtocolUtils {
   public static void writeGenericComponent(ByteBuf buf, Component component,
                                                ProtocolVersion protocolVersion, int maxLen) {
     if (protocolVersion.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) {
-      writeString(buf, GsonComponentSerializer.gson().serialize(component), maxLen);
+      writeString(buf, getJsonChatSerializer(protocolVersion).serialize(component), maxLen);
     } else {
       writeString(buf, LegacyComponentSerializer.legacySection().serialize(component), maxLen);
     }
