@@ -266,7 +266,7 @@ public class JoinGame implements MinecraftPacket {
         ProtocolUtils.writeString(buf, dimensionInfo.getRegistryIdentifier());
       } else {
         ProtocolUtils.writeString(buf, dimensionInfo.getRegistryIdentifier());
-        ProtocolUtils.writeString(buf, dimensionInfo.getLevelName());
+        ProtocolUtils.writeString(buf, dimensionInfo.getLevelName().get());
       }
     } else if (version.compareTo(ProtocolVersion.MINECRAFT_1_9_1) >= 0) {
       buf.writeInt(dimension);

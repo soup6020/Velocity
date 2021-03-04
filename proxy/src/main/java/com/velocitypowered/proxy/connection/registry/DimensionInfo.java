@@ -1,12 +1,13 @@
 package com.velocitypowered.proxy.connection.registry;
 
 import com.google.common.base.Preconditions;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class DimensionInfo {
 
   private final String registryIdentifier;
-  private final String levelName;
+  private final Optional<String> levelName;
   private final boolean isFlat;
   private final boolean isDebugType;
 
@@ -23,7 +24,7 @@ public final class DimensionInfo {
         registryIdentifier, "registryIdentifier cannot be null");
     Preconditions.checkArgument(registryIdentifier.length() > 0,
         "registryIdentifier cannot be empty");
-    this.levelName = levelName;
+    this.levelName = Optional.ofNullable(levelName);
     this.isFlat = isFlat;
     this.isDebugType = isDebugType;
   }
@@ -36,7 +37,7 @@ public final class DimensionInfo {
     return isFlat;
   }
 
-  public @Nullable String getLevelName() {
+  public Optional<String> getLevelName() {
     return levelName;
   }
 

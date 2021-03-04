@@ -154,7 +154,7 @@ public class Respawn implements MinecraftPacket {
         ProtocolUtils.writeString(buf, dimensionInfo.getRegistryIdentifier());
       } else {
         ProtocolUtils.writeString(buf, dimensionInfo.getRegistryIdentifier());
-        ProtocolUtils.writeString(buf, dimensionInfo.getLevelName());
+        ProtocolUtils.writeString(buf, dimensionInfo.getLevelName().get());
       }
     } else {
       buf.writeInt(dimension);

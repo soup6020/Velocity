@@ -68,11 +68,11 @@ public final class DimensionRegistry {
    * @return true: the dimension information is valid for this registry
    */
   public boolean isValidFor(DimensionInfo toValidate) {
-    if (toValidate == null) {
+    if (toValidate == null || !toValidate.getLevelName().isPresent()) {
       return false;
     }
     return registeredDimensions.containsKey(toValidate.getRegistryIdentifier())
-        && levelNames.contains(toValidate.getLevelName());
+        && levelNames.contains(toValidate.getLevelName().get());
   }
 
   /**
